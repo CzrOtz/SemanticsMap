@@ -1,20 +1,10 @@
-# from sentence_transformers import SentenceTransformer
-import numpy as np
-import pandas as pd
-from sklearn.decomposition import PCA
 import plotly.express as px
-import re
 import nltk
-import umap
-
-import plotly.graph_objects as go
-from cleantext import clean
 import utils
 
 print("Starting the process...")
 
 cleaned_text = utils.open_and_clean_text('MyText.txt')
-
 
 sentences = nltk.sent_tokenize(cleaned_text)
 
@@ -30,9 +20,9 @@ pca_reduced_embeddings = utils.pca_reduce(embeddings, dimensions=5)
 umap_reduced_embeddings = utils.umap_reduce(embeddings, dimensions=5)
 
 
-df_pca = utils.create_5d_dataframe(pca_reduced_embeddings, sentences, multiplier=100)
+df_pca = utils.create_5d_dataframe(pca_reduced_embeddings, sentences, 100, "mytext")
 
-df_umap = utils.create_5d_dataframe(umap_reduced_embeddings, sentences, multiplier=1)
+df_umap = utils.create_5d_dataframe(umap_reduced_embeddings, sentences, 1, "mytext")
 
 
 #part 5 - create a 3D scatter plot using plotly to visualize the sentences in 3D space
