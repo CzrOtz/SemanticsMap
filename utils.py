@@ -5,6 +5,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import umap
 import pandas as pd
+import pacmap
 import sys
 
 def open_and_clean_text(file_path):
@@ -49,6 +50,12 @@ def tsne_reduce(embeddings, dimensions):
     tsne = TSNE(n_components=dimensions)
     tsne_reduced_embeddings = tsne.fit_transform(embeddings)
     return tsne_reduced_embeddings
+
+def pacmap_reduce(embeddings, dimensions, neighbors):
+    reducer = pacmap.PaCMAP(n_components=dimensions, n_neighbors=neighbors, MN_ratio=1.0, FP_ratio=3.0, random_state=42, distance='angular', num_iters=1000, lr=2.0)
+    pacmap_reduced_embeddings = reducer.fit_transform(embeddings,init='pca')
+    return pacmap_reduced_embeddings
+
 
 def create_3d_dataframe(reduced_embeddings, sentences, multiplier,source):
     df = pd.DataFrame(reduced_embeddings, columns=['dim1', 'dim2', 'dim3'])

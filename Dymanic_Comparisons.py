@@ -4,18 +4,18 @@ import utils
 import pandas as pd
 import numpy as np
 
-user_directories = ['text1.txt', 'text2.txt', 'text3.txt','control.txt', 'unrelated.txt', 'HumanText.txt', 'unrelated2.txt']
+user_directories = ['text1.txt', 'text2.txt', 'text3.txt','control.txt']
 embeddings_list = []
 all_sentences = []
 all_sources = []
 dimensions = 3
-neighbors = 5
+neighbors = 15
 multiplier = 1
 x_cordinate = 'dim1'
 y_cordinate = 'dim2'
 z_cordinate = 'dim3'
 color_cordinate = lambda x: 'dim4' if x == 4 else 'source'
-symbol_cordinate = lambda x: 'source' if x == 4 else None
+
 
 
 for files in user_directories:
@@ -27,36 +27,55 @@ for files in user_directories:
     all_sources.extend([files] * len(sentence))
 
 all_embeddings = np.vstack(embeddings_list)
-umap_reduced_embeddings = utils.umap_reduce(all_embeddings, dimensions, neighbors)
+pacmap_reduced_embeddings = utils.pacmap_reduce(all_embeddings, dimensions, neighbors)
 
 if dimensions == 3:
-    df_umap_combined = utils.create_3d_dataframe(umap_reduced_embeddings, all_sentences, multiplier, all_sources)
+    df_pacmap_combined = utils.create_3d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
 elif dimensions == 4:   
-    df_umap_combined = utils.create_4d_dataframe(umap_reduced_embeddings, all_sentences, multiplier, all_sources)
+    df_pacmap_combined = utils.create_4d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
 
 
 
-fig_umap = px.scatter_3d(
-    df_umap_combined,
+fig_pacmap = px.scatter_3d(
+    df_pacmap_combined,
     x=x_cordinate,
     y=y_cordinate,
     z=z_cordinate,
     color = color_cordinate(dimensions),
-    symbol = symbol_cordinate(dimensions),
+    symbol = 'source',
     hover_data=['sentences', 'source'],
-    title='UMAP 3D Scatter Plot'
+    title='PaCMAP 3D Scatter Plot'
 )
 
-fig_umap.show()
+# Move the legend to the bottom-center and horizontal
+fig_pacmap.update_layout(
+    legend=dict(
+        orientation="h",        # Horizontal legend
+        yanchor="bottom",
+        y=-0.1,                # Pull it below the plot
+        xanchor="center",
+        x=0.5
+    ),
+    # You can also move the Color Bar if you want
+    coloraxis_colorbar=dict(
+        title="3rd Dim Variance",
+        thicknessmode="pixels", thickness=15,
+        lenmode="pixels", len=200,
+        yanchor="top", y=1,
+        ticks="outside"
+    )
+)
 
-# # --- OLD UMAP ENGINE ---
-# import umap
-# reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, n_components=3, metric='cosine')
-# umap_reduced = reducer.fit_transform(all_embeddings)
+fig_matrix = px.scatter_matrix(
+    df_pacmap_combined,
+    dimensions=['dim1', 'dim2', 'dim3'],
+    color='source', 
+    symbol='source'
+)
 
-# # --- NEW PACMAP ENGINE ---
-# import pacmap
-# reducer = pacmap.PaCMAP(n_components=3, n_neighbors=10, MN_ratio=0.5, FP_ratio=2.0)
-# # Note: PaCMAP uses Euclidean by default, but you can pre-calculate a 
-# # cosine distance matrix if you want that specific text-alignment.
-# umap_reduced = reducer.fit_transform(all_embeddings)
+
+
+fig_matrix.show()
+
+fig_pacmap.show()
+
