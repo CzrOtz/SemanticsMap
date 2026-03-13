@@ -4,12 +4,11 @@ import utils
 import pandas as pd
 import numpy as np
 
-test = ["The town woke up every morning to the sound of the old clock tower. Its bells echoed across the river and through the narrow streets. Most people ignored it, but Daniel always listened carefully. To him, the sound meant another chance to try again. He worked in a tiny repair shop that smelled like oil and dust. Broken radios, watches, and toys filled the shelves. Daniel liked fixing things because it felt like reversing time. Every screw tightened was a small victory. One afternoon a child brought in a shattered music box. It took Daniel hours, but he rebuilt it piece by piece. When the melody finally played again, the child smiled so wide that the entire day felt worth it",
-        "Far out in the desert stood a lonely research station. Wind constantly pushed sand against the metal walls. Inside, a scientist named Mira studied signals from distant space. Most nights the equipment produced nothing but static. Still, she listened patiently through her headphones. One evening a strange rhythm appeared in the noise. It was faint but clearly organized. Mira replayed the signal again and again to be sure. The pattern repeated every thirty seconds like a heartbeat. She felt a mix of excitement and fear. If the signal was real, it meant something out there was speaking. Mira leaned back in her chair, staring at the dark sky beyond the window. For the first time in years, the desert station did not feel lonely."]
+
 
 story_names = ["Story 1", "Story 2"]
 
-def pacMap_dataframe(text_passages: list, sources: list, dimensions: int, neighbors: int, multiplier: int) -> pd.DataFrame:
+def pacMap_dataframe(text_passages: list, multiplier: int, sources: list, pacmap_settings_int_dict: dict, pacmap_settings_float_dict: dict, pacmap_settings_bool_dict: dict, pacmap_settings_string_dict: dict) -> pd.DataFrame:
     embeddings_list = []
     all_sentences = []
     all_sources = []
@@ -23,17 +22,17 @@ def pacMap_dataframe(text_passages: list, sources: list, dimensions: int, neighb
         all_sources.extend([source] * len(sentence))
 
     all_embeddings = np.vstack(embeddings_list)
-    pacmap_reduced_embeddings = utils.pacmap_reduce(all_embeddings, dimensions, neighbors)
+    pacmap_reduced_embeddings = utils.pacmap_reduce_fully_tunable(all_embeddings, pacmap_settings_int_dict, pacmap_settings_float_dict, pacmap_settings_bool_dict, pacmap_settings_string_dict)
 
-    if dimensions == 3:
+    if pacmap_settings_int_dict['n_components'] == 3:
         df_pacmap_combined = utils.create_3d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
-    elif dimensions == 4:   
+    elif pacmap_settings_int_dict['n_components'] == 4:   
         df_pacmap_combined = utils.create_4d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
 
     return df_pacmap_combined
 
 
-def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int) -> px.scatter_3d:
+def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int, color_scale: str) -> px.scatter_3d:
     if dimensions == 4: color_cordinate = "dim4"
     if dimensions == 3: color_cordinate = "source"
 
@@ -43,35 +42,77 @@ def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z
         y=y_cordinate,
         z=z_cordinate,
         color = color_cordinate,
+        color_continuous_scale=color_scale,
         symbol = 'source',
         hover_data=['sentences', 'source'],
-        title='PaCMAP 3D Scatter Plot'
+        title='PaCMAP 3D Scatter Plot',
+        height=800,
+        width=1200
     )
 
-    # Move the legend to the bottom-center and horizontal
     fig_pacmap.update_layout(
-        legend=dict(orientation="h", y=-0.1, x=0.5, xanchor='center')
-    )
-    
+        paper_bgcolor="#161b22",
+        plot_bgcolor="#161b22"
+        )
+
+    if dimensions == 4:
+        fig_pacmap.update_layout(
+            legend=dict(x=0.01, y=0.99, xanchor="left", yanchor="top"),
+            coloraxis_colorbar=dict(x=1.08, y=0.5, len=0.8),
+            margin=dict(r=80)
+        )
+        fig_pacmap.update_traces(
+            marker=dict(
+                colorbar=dict(
+                    x=1.15,
+                    y=0.5,
+                    len=0.75,
+                    thickness=18
+                )
+            )
+        )   
+
+
     return fig_pacmap
 
-def scatter_matrix(data_frame: pd.DataFrame, dimensions: int) -> px.scatter_matrix:
+def scatter_matrix(data_frame: pd.DataFrame, dimensions: int, color_scale: str) -> px.scatter_matrix:
     if dimensions == 4: color_cordinate = "dim4"
     if dimensions == 3: color_cordinate = "source"
 
     fig_matrix = px.scatter_matrix(
     data_frame,
     dimensions=['dim1', 'dim2', 'dim3'],
-    color=color_cordinate, 
-    symbol='source'
+    color=color_cordinate,
+    color_continuous_scale=color_scale, 
+    symbol='source',
+    height=800,
+    width=1200,
     )
+
+    fig_matrix.update_layout(
+        paper_bgcolor="#161b22",
+        plot_bgcolor="#161b22"
+    )
+
+    if dimensions == 4:
+        fig_matrix.update_layout(
+            legend=dict(x=0.01, y=0.99, xanchor="left", yanchor="top"),
+            coloraxis_colorbar=dict(x=1.08, y=0.5, len=0.8),
+            margin=dict(r=80)
+        )
+
+        fig_matrix.update_layout(
+            paper_bgcolor="#161b22",
+            plot_bgcolor="#161b22",
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.05,
+                xanchor="left",
+                x=0
+            )
+        )
     
     return fig_matrix
 
 
-# test_df = pacMap_dataframe(test, story_names, 3, 10, 1)
-# fig = scatter_plot(test_df, 'dim1', 'dim2', 'dim3', 3)
-# fig_matrix = scatter_matrix(test_df, 3)
-
-# fig.show()
-# fig_matrix.show()

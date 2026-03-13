@@ -48,8 +48,7 @@ def clean_text(text):
 
 def embed(tokenized_sentences):
     if len(tokenized_sentences) < 3:
-        print(tokenized_sentences)
-        sys.exit("Error: The number of sentences must be greater than 2 for meaningful dimensionality reduction.")
+        raise ValueError("At least 3 sentences are required for embedding.")
     model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cuda')
     embeddings = model.encode(tokenized_sentences, show_progress_bar=True)
     return embeddings
@@ -72,6 +71,21 @@ def tsne_reduce(embeddings, dimensions):
 def pacmap_reduce(embeddings, dimensions, neighbors):
     reducer = pacmap.PaCMAP(n_components=dimensions, n_neighbors=neighbors, MN_ratio=0.5, FP_ratio=2, random_state=42, distance='angular', num_iters=1000, lr=1.0)
     pacmap_reduced_embeddings = reducer.fit_transform(embeddings,init='pca')
+    return pacmap_reduced_embeddings
+
+def pacmap_reduce_fully_tunable(embeddings, int_dict: dict, float_dict: dict, bool_dict: dict, string_dict: dict):
+    reducer = pacmap.PaCMAP(
+        n_components=int_dict['n_components'],
+        n_neighbors=int_dict['n_neighbors'],
+        MN_ratio=float_dict['MN_ratio'],
+        FP_ratio=float_dict['FP_ratio'],
+        lr=float_dict['lr'],
+        num_iters=int_dict['num_iters'],
+        distance=string_dict['distance'],
+        random_state=int_dict['random_state'],
+        apply_pca=bool_dict['apply_pca']
+    )
+    pacmap_reduced_embeddings = reducer.fit_transform(embeddings,init=string_dict['init'])
     return pacmap_reduced_embeddings
 
 
