@@ -3,10 +3,10 @@ import nltk
 import utils
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
 
 
 
-story_names = ["Story 1", "Story 2"]
 
 def pacMap_dataframe(text_passages: list, multiplier: int, sources: list, pacmap_settings_int_dict: dict, pacmap_settings_float_dict: dict, pacmap_settings_bool_dict: dict, pacmap_settings_string_dict: dict) -> pd.DataFrame:
     embeddings_list = []
@@ -75,6 +75,48 @@ def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z
 
     return fig_pacmap
 
+def line_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int, color_scale: str) -> px.scatter_3d:
+    if dimensions == 4: color_cordinate = "dim4"
+    if dimensions == 3: color_cordinate = "source"
+
+    fig_pacmap = px.line_3d(
+        data_frame,
+        x=x_cordinate,
+        y=y_cordinate,
+        z=z_cordinate,
+        color = color_cordinate,
+        symbol = 'source',
+        hover_data=['sentences', 'source'],
+        title='PaCMAP 3D Line Plot',
+        height=800,
+        width=1200
+    )
+
+    fig_pacmap.update_layout(
+        paper_bgcolor="#161b22",
+        plot_bgcolor="#161b22"
+        )
+
+    if dimensions == 4:
+        fig_pacmap.update_layout(
+            legend=dict(x=0.01, y=0.99, xanchor="left", yanchor="top"),
+            coloraxis_colorbar=dict(x=1.08, y=0.5, len=0.8),
+            margin=dict(r=80)
+        )
+        fig_pacmap.update_traces(
+            marker=dict(
+                colorbar=dict(
+                    x=1.15,
+                    y=0.5,
+                    len=0.75,
+                    thickness=18
+                )
+            )
+        )   
+
+
+    return fig_pacmap
+
 def scatter_matrix(data_frame: pd.DataFrame, dimensions: int, color_scale: str) -> px.scatter_matrix:
     if dimensions == 4: color_cordinate = "dim4"
     if dimensions == 3: color_cordinate = "source"
@@ -114,5 +156,22 @@ def scatter_matrix(data_frame: pd.DataFrame, dimensions: int, color_scale: str) 
         )
     
     return fig_matrix
+    
+
+
+def test_cone():
+    fig = go.Figure(data=go.Cone(
+        x=[0, 1, 2],
+        y=[0, 1, 2],
+        z=[0, 1, 2],
+        u=[1, 1, 1],
+        v=[0, 1, 0],
+        w=[0, 0, 1],
+        sizemode="scaled",
+        sizeref=0.5,
+        showscale=True
+    ))
+    return fig
+
 
 

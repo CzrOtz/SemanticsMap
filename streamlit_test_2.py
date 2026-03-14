@@ -110,9 +110,20 @@ if st.button("Process Texts"):
         pacMap_df = dc.pacMap_dataframe(text_data, multiplier, labels, pacMap_settings_int_dict, pacMap_settings_float_dict, pacMap_settings_bool_dict, pacMap_settings_string_dict)
         scatter_fig = dc.scatter_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
         matrix_fig = dc.scatter_matrix(pacMap_df, dimension_count, color_scale)
+        # cone_fig = dc.cone_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
+        if dimension_count == 3:
+            line_fig = dc.line_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
+        else:
+            st.warning("Line plot is only available for 3D visualizations.")
+
 
     st.plotly_chart(scatter_fig, width="stretch")
     st.plotly_chart(matrix_fig, width="stretch")
+    # st.plotly_chart(cone_fig, width="stretch")
+    st.plotly_chart(dc.test_cone(), width="stretch")
+
+    if dimension_count == 3:
+        st.plotly_chart(line_fig, width="stretch")
 
 
 
