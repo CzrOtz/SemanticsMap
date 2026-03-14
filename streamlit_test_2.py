@@ -20,9 +20,9 @@ with st.expander("About this tool"):
 st.sidebar.title("controls")
 
 neighbor_count = st.sidebar.number_input("Neighbor count", min_value=2, value=15)
-dimension_count = st.sidebar.selectbox("Dimension count/n components", [3, 4], index=0)
+dimension_count = st.sidebar.selectbox("Dimension count/n components", [3, 4, 5, 6], index=0)
 
-if dimension_count == 4:
+if dimension_count >= 4:
     color_scale = st.sidebar.selectbox(
         "Color scale",
         ['Viridis', 'Cividis', 'Plasma', 'Inferno', 'Magma', 'Turbo'],
@@ -108,22 +108,50 @@ st.divider()
 if st.button("Process Texts"):
     with st.spinner("Processing texts..."):
         pacMap_df = dc.pacMap_dataframe(text_data, multiplier, labels, pacMap_settings_int_dict, pacMap_settings_float_dict, pacMap_settings_bool_dict, pacMap_settings_string_dict)
-        scatter_fig = dc.scatter_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
-        matrix_fig = dc.scatter_matrix(pacMap_df, dimension_count, color_scale)
-        # cone_fig = dc.cone_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
+
+
+        if dimension_count == 6:
+            st.warning("scatter plot, matrix, and line plot not available for 6 dimensions")
+            cone_plot = dc.cone_plot(pacMap_df, color_scale)
+            st.plotly_chart(cone_plot, width="stretch")
+        
+        if dimension_count == 5:
+            st.warning("line plot and matrix not available for 5 dimensions")
+            st.warning("cone plot not available for dimensions 5 through 3")
+            st.warning("matrix plot not available for 5 dimensions and lower")
+
+            scatter_fig = dc.scatter_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
+
+            st.plotly_chart(scatter_fig, width="stretch")
+
+        if dimension_count == 4:
+            st.warning("cone plot not available for dimensions 5 through 3")
+            st.warning("line plot not available for 4 dimensions")
+            
+            scatter_fig = dc.scatter_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
+            matrix_fig = dc.scatter_matrix(pacMap_df, dimension_count, color_scale)
+
+            st.plotly_chart(scatter_fig, width="stretch")
+            st.plotly_chart(matrix_fig, width="stretch")
+        
         if dimension_count == 3:
-            line_fig = dc.line_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
-        else:
-            st.warning("Line plot is only available for 3D visualizations.")
+            st.warning("cone plot not available for dimensions 5 through 3")
+
+            scatter_fig = dc.scatter_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
+            matrix_fig = dc.scatter_matrix(pacMap_df, dimension_count, color_scale)
+            line_fig = dc.line_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count)
+
+            st.plotly_chart(scatter_fig, width="stretch")
+            st.plotly_chart(matrix_fig, width="stretch")
+            st.plotly_chart(line_fig, width="stretch")
 
 
-    st.plotly_chart(scatter_fig, width="stretch")
-    st.plotly_chart(matrix_fig, width="stretch")
-    # st.plotly_chart(cone_fig, width="stretch")
-    st.plotly_chart(dc.test_cone(), width="stretch")
 
-    if dimension_count == 3:
-        st.plotly_chart(line_fig, width="stretch")
+    
+    
+  
+
+
 
 
 

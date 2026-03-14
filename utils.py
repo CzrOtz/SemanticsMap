@@ -120,3 +120,16 @@ def create_5d_dataframe(reduced_embeddings, sentences, multiplier, source):
     df['dim5'] = df['dim5'].abs()
     return df
     
+def create_6d_dataframe(reduced_embeddings, sentences, multiplier, source):
+    df = pd.DataFrame(reduced_embeddings, columns=['dim1', 'dim2', 'dim3', 'dim4', 'dim5', 'dim6'])
+    df['sentences'] = sentences
+    df['source'] = source
+    df['dim1'] *= multiplier
+    df['dim2'] *= multiplier
+    df['dim3'] *= multiplier
+    df['dim4'] *= multiplier
+    df['dim5'] *= multiplier
+    df['dim6'] *= multiplier
+    df['dim5'] *= multiplier
+    df['dim6'] *= multiplier
+    return df

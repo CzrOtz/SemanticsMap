@@ -26,13 +26,25 @@ def pacMap_dataframe(text_passages: list, multiplier: int, sources: list, pacmap
 
     if pacmap_settings_int_dict['n_components'] == 3:
         df_pacmap_combined = utils.create_3d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
-    elif pacmap_settings_int_dict['n_components'] == 4:   
+    if pacmap_settings_int_dict['n_components'] == 4:   
         df_pacmap_combined = utils.create_4d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
+    
+    if pacmap_settings_int_dict['n_components'] == 5:
+        df_pacmap_combined = utils.create_5d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
+
+    if pacmap_settings_int_dict['n_components'] == 6:
+        df_pacmap_combined = utils.create_6d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
 
     return df_pacmap_combined
 
 
 def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int, color_scale: str) -> px.scatter_3d:
+
+    if dimensions == 5:
+        color_cordinate = "dim4" 
+        size_cordinate = "dim5"
+    else:
+        size_cordinate = None
     if dimensions == 4: color_cordinate = "dim4"
     if dimensions == 3: color_cordinate = "source"
 
@@ -44,6 +56,7 @@ def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z
         color = color_cordinate,
         color_continuous_scale=color_scale,
         symbol = 'source',
+        size=size_cordinate,
         hover_data=['sentences', 'source'],
         title='PaCMAP 3D Scatter Plot',
         height=800,
@@ -75,7 +88,7 @@ def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z
 
     return fig_pacmap
 
-def line_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int, color_scale: str) -> px.scatter_3d:
+def line_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int) -> px.scatter_3d:
     if dimensions == 4: color_cordinate = "dim4"
     if dimensions == 3: color_cordinate = "source"
 
@@ -159,19 +172,67 @@ def scatter_matrix(data_frame: pd.DataFrame, dimensions: int, color_scale: str) 
     
 
 
-def test_cone():
+# def cone_plot(data_frame: pd.DataFrame) -> go.Figure:
+#     fig = go.Figure(data=go.Cone(
+#         x=data_frame['dim1'],
+#         y=data_frame['dim2'],
+#         z=data_frame['dim3'],
+#         u=data_frame['dim4'],
+#         v=data_frame['dim5'],
+#         w=data_frame['dim6'],
+#         sizemode="scaled",
+#         sizeref=10,
+#         showscale=True
+#     ))
+
+#     fig.update_layout(
+#         height=900,
+#         width=1200,
+#         paper_bgcolor="#161b22",
+#         scene=dict(
+#             xaxis_title="dim1",
+#             yaxis_title="dim2",
+#             zaxis_title="dim3"
+#         )
+#     )
+
+#     return fig
+
+def cone_plot(data_frame: pd.DataFrame, color_scale: str) -> go.Figure:
     fig = go.Figure(data=go.Cone(
-        x=[0, 1, 2],
-        y=[0, 1, 2],
-        z=[0, 1, 2],
-        u=[1, 1, 1],
-        v=[0, 1, 0],
-        w=[0, 0, 1],
+        x=data_frame['dim1'],
+        y=data_frame['dim2'],
+        z=data_frame['dim3'],
+        u=data_frame['dim4'],
+        v=data_frame['dim5'],
+        w=data_frame['dim6'],
+        colorscale=color_scale,
+        showscale=True,
         sizemode="scaled",
-        sizeref=0.5,
-        showscale=True
+        sizeref=20,
+        customdata=data_frame[['source', 'sentences']].to_numpy(),
+        hovertemplate=(
+            "Source: %{customdata[0]}<br>"
+            "Sentence: %{customdata[1]}<br>"
+            "x: %{x:.2f}<br>"
+            "y: %{y:.2f}<br>"
+            "z: %{z:.2f}<br>"
+            "u: %{u:.2f}<br>"
+            "v: %{v:.2f}<br>"
+            "w: %{w:.2f}<br>"
+        )
     ))
+
+    fig.update_layout(
+        height=1200,
+        width=1500,
+        paper_bgcolor="#161b22",
+        scene=dict(
+            xaxis_title="dim1",
+            yaxis_title="dim2",
+            zaxis_title="dim3"
+        )
+    )
+
     return fig
-
-
 
