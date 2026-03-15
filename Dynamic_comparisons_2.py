@@ -172,33 +172,9 @@ def scatter_matrix(data_frame: pd.DataFrame, dimensions: int, color_scale: str) 
     
 
 
-# def cone_plot(data_frame: pd.DataFrame) -> go.Figure:
-#     fig = go.Figure(data=go.Cone(
-#         x=data_frame['dim1'],
-#         y=data_frame['dim2'],
-#         z=data_frame['dim3'],
-#         u=data_frame['dim4'],
-#         v=data_frame['dim5'],
-#         w=data_frame['dim6'],
-#         sizemode="scaled",
-#         sizeref=10,
-#         showscale=True
-#     ))
 
-#     fig.update_layout(
-#         height=900,
-#         width=1200,
-#         paper_bgcolor="#161b22",
-#         scene=dict(
-#             xaxis_title="dim1",
-#             yaxis_title="dim2",
-#             zaxis_title="dim3"
-#         )
-#     )
 
-#     return fig
-
-def cone_plot(data_frame: pd.DataFrame, color_scale: str) -> go.Figure:
+def cone_plot(data_frame: pd.DataFrame, color_scale: str, sizem_mode: str, size_ref: float) -> go.Figure:
     fig = go.Figure(data=go.Cone(
         x=data_frame['dim1'],
         y=data_frame['dim2'],
@@ -208,8 +184,8 @@ def cone_plot(data_frame: pd.DataFrame, color_scale: str) -> go.Figure:
         w=data_frame['dim6'],
         colorscale=color_scale,
         showscale=True,
-        sizemode="scaled",
-        sizeref=20,
+        sizemode=sizem_mode,
+        sizeref=size_ref,
         customdata=data_frame[['source', 'sentences']].to_numpy(),
         hovertemplate=(
             "Source: %{customdata[0]}<br>"

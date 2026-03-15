@@ -31,6 +31,15 @@ if dimension_count >= 4:
 else:
     color_scale = None
 
+if dimension_count == 6:
+    size_mode = st.sidebar.selectbox(
+        "Size mode",
+        ['scaled', 'absolute'],
+        index=0
+    )
+
+    size_ref = st.sidebar.number_input("Size reference", value=20.0)
+
 
 
 
@@ -112,7 +121,7 @@ if st.button("Process Texts"):
 
         if dimension_count == 6:
             st.warning("scatter plot, matrix, and line plot not available for 6 dimensions")
-            cone_plot = dc.cone_plot(pacMap_df, color_scale)
+            cone_plot = dc.cone_plot(pacMap_df, color_scale, size_mode, size_ref)
             st.plotly_chart(cone_plot, width="stretch")
         
         if dimension_count == 5:
