@@ -17,12 +17,107 @@ with st.expander("About this tool"):
 
 #SIDE BAR AREA
 
+with st.sidebar.expander("Reduction Algorithm"):
+    reduction_algorithm = st.selectbox(
+        "Select dimensionality reduction algorithm",
+        ['PaCMAP', 'UMAP', 'PCA'],
+        index=0
+    )
+
 st.sidebar.title("controls")
 
-neighbor_count = st.sidebar.number_input("Neighbor count", min_value=2, value=15)
-dimension_count = st.sidebar.selectbox("Dimension count/n components", [3, 4, 5, 6], index=0)
 
-if dimension_count >= 4:
+# dimension_count = st.sidebar.selectbox("Dimension count/n components", [3, 4, 5, 6], index=0)
+
+
+
+
+
+def pacMap_settings_func() -> dict: 
+    with st.sidebar.expander("pacmac Advanced Settings"):
+        neighbor_count = st.number_input("Neighbor count", min_value=2, value=15)
+        dimension_count = st.selectbox("Dimension count/n components", [3, 4, 5, 6], index=0)
+        MN_ratio = st.number_input("MN_ratio", value=0.5)
+        FP_ratio = st.number_input("FP_ratio", value=2.0)
+        lr = st.number_input("Learning Rate", value=1.0)
+        num_iters = st.number_input("Iterations", value=1000)
+        distance = st.selectbox("Distance Metric", ["angular", "euclidean", "manhattan"], index=0)
+        random_state = st.number_input("Random State", value=42)
+        init = st.selectbox("Initialization Method", ["pca", "random"])
+        apply_pca = st.checkbox("Apply PCA", value=True)
+        multiplier = st.number_input("Scale multiplier", min_value=1, value=1)
+
+        return {
+            "n_neighbors": neighbor_count,
+            "n_components": dimension_count,
+            "num_iters": num_iters,
+            "random_state": random_state,
+            "MN_ratio": MN_ratio,
+            "FP_ratio": FP_ratio,
+            "lr": lr,
+            "apply_pca": apply_pca,
+            "distance": distance,
+            "init": init,
+            "multiplier": multiplier
+        }
+    
+def umap_settings_func() -> dict:
+    with st.sidebar.expander("UMAP Advanced Settings"):
+        neighbor_count = st.number_input("Neighbor count", min_value=2, value=15)
+        dimension_count = st.selectbox("Dimension count/n components", [3, 4, 5, 6], index=0)
+        distance = st.selectbox("Distance Metric", ["euclidean", "manhattan", "cosine", "correlation"], index=0)
+        random_state = st.number_input("Random State", value=42)
+        min_dist = st.number_input("Min Dist", value=0.1)
+        multiplier = st.number_input("Scale multiplier", min_value=1, value=1)
+
+        return {
+            "n_neighbors": neighbor_count,
+            "n_components": dimension_count,
+            "random_state": random_state,
+            "distance": distance,
+            "min_dist": min_dist,
+            "multiplier": multiplier
+        }
+    
+def pca_settings_func() -> dict:
+    with st.sidebar.expander("PCA Advanced Settings"):
+        dimension_count = st.selectbox("Dimension count/n components", [3, 4, 5, 6], index=0)
+        svd_solver = st.selectbox("SVD Solver", ["auto", "full", "arpack", "randomized"], index=0)
+
+        if svd_solver == "randomized":
+            random_state = st.number_input("Random State", value=42)
+        else:
+            random_state = None
+
+        whiten = st.checkbox("Whiten", value=False)
+        multiplier = st.number_input("Scale multiplier", min_value=1, value=1)
+
+        return {
+            "n_components": dimension_count,
+            "svd_solver": svd_solver,
+            "whiten": whiten,
+            "random_state": random_state,
+            "multiplier": multiplier
+        }
+
+
+if reduction_algorithm == 'PaCMAP':
+    reducer_settings = pacMap_settings_func()
+if reduction_algorithm == 'UMAP':
+    reducer_settings = umap_settings_func()
+if reduction_algorithm == 'PCA':
+    reducer_settings = pca_settings_func()
+
+print("reducer:", repr(reducer_settings))
+
+st.write(f"Current reduction algorithm: {reduction_algorithm}")
+
+#conditionals for the plot
+
+#color scale for 4d and 5d concerning scatter, matrix, and cone plot
+#3d does not have a color scale option
+
+if reducer_settings['n_components'] >= 4:
     color_scale = st.sidebar.selectbox(
         "Color scale",
         ['Viridis', 'Cividis', 'Plasma', 'Inferno', 'Magma', 'Turbo'],
@@ -31,7 +126,8 @@ if dimension_count >= 4:
 else:
     color_scale = None
 
-if dimension_count == 6:
+#this only concerns only cone plot
+if reducer_settings['n_components']  == 6:
     size_mode = st.sidebar.selectbox(
         "Size mode",
         ['scaled', 'absolute'],
@@ -41,41 +137,7 @@ if dimension_count == 6:
     size_ref = st.sidebar.number_input("Size reference", value=20.0)
 
 
-
-
-with st.sidebar.expander("Advanced Settings"):
-    MN_ratio = st.number_input("MN_ratio", value=0.5)
-    FP_ratio = st.number_input("FP_ratio", value=2.0)
-    lr = st.number_input("Learning Rate", value=1.0)
-    num_iters = st.number_input("Iterations", value=1000)
-    distance = st.selectbox("Distance Metric", ["angular", "euclidean", "manhattan"], index=0)
-    random_state = st.number_input("Random State", value=42)
-    init = st.selectbox("Initialization Method", ["pca", "random"])
-    apply_pca = st.checkbox("Apply PCA", value=True)
-    multiplier = st.number_input("Scale multiplier", min_value=1, value=1)
-    
-
-pacMap_settings_int_dict = {
-    'n_components': dimension_count,
-    'n_neighbors': neighbor_count,
-    'num_iters': num_iters,
-    'random_state': random_state
-}
-
-pacMap_settings_float_dict = {
-    'MN_ratio': MN_ratio,
-    'FP_ratio': FP_ratio,
-    'lr': lr
-}
-
-pacMap_settings_bool_dict = {
-    'apply_pca': apply_pca
-}
-
-pacMap_settings_string_dict = {
-    'distance': distance,
-    'init': init
-}
+###### TEXT CAPTURE AREA START
 
 st.divider()
 
@@ -96,6 +158,9 @@ for i in range(st.session_state.num_texts):
 
 col1, col2, col3 = st.columns([3, 2, 1])
 
+#TEXT CAPTURE AREA END
+
+#text boxes start #######################
 
 st.divider()
 
@@ -114,50 +179,57 @@ with remove_text_col:
 
 st.divider()
 
-if st.button("Process Texts"):
-    with st.spinner("Processing texts..."):
-        pacMap_df = dc.pacMap_dataframe(text_data, multiplier, labels, pacMap_settings_int_dict, pacMap_settings_float_dict, pacMap_settings_bool_dict, pacMap_settings_string_dict)
+# text boxes end #######################
 
+def process_and_plot(reduction_algorithm):
+    if st.button("Process Texts"):
+        with st.spinner("Processing texts..."):
 
-        if dimension_count == 6:
-            st.warning("scatter plot, matrix, and line plot not available for 6 dimensions")
-            cone_plot = dc.cone_plot(pacMap_df, color_scale, size_mode, size_ref)
-            st.plotly_chart(cone_plot, width="stretch")
-        
-        if dimension_count == 5:
-            st.warning("line plot and matrix not available for 5 dimensions")
-            st.warning("cone plot not available for dimensions 5 through 3")
-            st.warning("matrix plot not available for 5 dimensions and lower")
+            print("THIS IS THE REDICTION ALGORITHM PASSED TO THE FUNCTION:", reduction_algorithm)
+            data_frame = dc.produce_dataframe(text_data, labels, reduction_algorithm, reducer_settings)
 
-            scatter_fig = dc.scatter_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
-
-            st.plotly_chart(scatter_fig, width="stretch")
-
-        if dimension_count == 4:
-            st.warning("cone plot not available for dimensions 5 through 3")
-            st.warning("line plot not available for 4 dimensions")
+            if reducer_settings['n_components']  == 6:
+                st.warning("scatter plot, matrix, and line plot not available for 6 dimensions")
+                cone_plot = dc.cone_plot(data_frame, color_scale, size_mode, size_ref)
+                st.plotly_chart(cone_plot, width="stretch")
             
-            scatter_fig = dc.scatter_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
-            matrix_fig = dc.scatter_matrix(pacMap_df, dimension_count, color_scale)
+            if reducer_settings['n_components'] == 5:
+                st.warning("line plot and matrix not available for 5 dimensions")
+                st.warning("cone plot not available for dimensions 5 through 3")
+                st.warning("matrix plot not available for 5 dimensions and lower")
 
-            st.plotly_chart(scatter_fig, width="stretch")
-            st.plotly_chart(matrix_fig, width="stretch")
-        
-        if dimension_count == 3:
-            st.warning("cone plot not available for dimensions 5 through 3")
+                scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale)
 
-            scatter_fig = dc.scatter_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count, color_scale)
-            matrix_fig = dc.scatter_matrix(pacMap_df, dimension_count, color_scale)
-            line_fig = dc.line_plot(pacMap_df, 'dim1', 'dim2', 'dim3', dimension_count)
+                st.plotly_chart(scatter_fig, width="stretch")
 
-            st.plotly_chart(scatter_fig, width="stretch")
-            st.plotly_chart(matrix_fig, width="stretch")
-            st.plotly_chart(line_fig, width="stretch")
+            if reducer_settings['n_components'] == 4:
+                st.warning("cone plot not available for dimensions 5 through 3")
+                st.warning("line plot not available for 4 dimensions")
+                
+                scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale)
+                matrix_fig = dc.scatter_matrix(data_frame, reducer_settings['n_components'], color_scale)
+
+                st.plotly_chart(scatter_fig, width="stretch")
+                st.plotly_chart(matrix_fig, width="stretch")
+            
+            if reducer_settings['n_components'] == 3:
+                st.warning("cone plot not available for dimensions 5 through 3")
+
+                scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale)
+                matrix_fig = dc.scatter_matrix(data_frame, reducer_settings['n_components'], color_scale)
+                line_fig = dc.line_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'])
+
+                st.plotly_chart(scatter_fig, width="stretch")
+                st.plotly_chart(matrix_fig, width="stretch")
+                st.plotly_chart(line_fig, width="stretch")
+
+
 
 
 
     
-    
+
+process_and_plot(reduction_algorithm)
   
 
 

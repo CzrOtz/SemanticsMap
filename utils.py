@@ -58,8 +58,28 @@ def pca_reduce(embeddings, dimensions):
     reduced_embeddings = pca.fit_transform(embeddings)
     return reduced_embeddings
 
+def pca_reduce_fully_tunable(embeddings, settings):
+    pca = PCA(
+        n_components=settings['n_components'],
+        svd_solver=settings['svd_solver'],
+        whiten=settings['whiten'],
+        random_state=settings['random_state']
+    )
+    return pca.fit_transform(embeddings)
+
 def umap_reduce(embeddings, dimensions, neighbors):
     umap_reduce = umap.UMAP(n_components=dimensions, n_neighbors=neighbors, metric='cosine', random_state=42, min_dist=0.1)
+    umap_reduced_embeddings = umap_reduce.fit_transform(embeddings)
+    return umap_reduced_embeddings
+
+def umap_reduce_fully_tunable(embeddings, settings):
+    umap_reduce = umap.UMAP(
+        n_components=settings['n_components'],
+        n_neighbors=settings['n_neighbors'],
+        metric=settings['distance'],
+        random_state=settings['random_state'],
+        min_dist=settings['min_dist']
+    )
     umap_reduced_embeddings = umap_reduce.fit_transform(embeddings)
     return umap_reduced_embeddings
 
@@ -73,19 +93,19 @@ def pacmap_reduce(embeddings, dimensions, neighbors):
     pacmap_reduced_embeddings = reducer.fit_transform(embeddings,init='pca')
     return pacmap_reduced_embeddings
 
-def pacmap_reduce_fully_tunable(embeddings, int_dict: dict, float_dict: dict, bool_dict: dict, string_dict: dict):
+def pacmap_reduce_fully_tunable(embeddings, settings):
     reducer = pacmap.PaCMAP(
-        n_components=int_dict['n_components'],
-        n_neighbors=int_dict['n_neighbors'],
-        MN_ratio=float_dict['MN_ratio'],
-        FP_ratio=float_dict['FP_ratio'],
-        lr=float_dict['lr'],
-        num_iters=int_dict['num_iters'],
-        distance=string_dict['distance'],
-        random_state=int_dict['random_state'],
-        apply_pca=bool_dict['apply_pca']
+        n_components=settings['n_components'],
+        n_neighbors=settings['n_neighbors'],
+        MN_ratio=settings['MN_ratio'],
+        FP_ratio=settings['FP_ratio'],
+        lr=settings['lr'],
+        num_iters=settings['num_iters'],
+        distance=settings['distance'],
+        random_state=settings['random_state'],
+        apply_pca=settings['apply_pca']
     )
-    pacmap_reduced_embeddings = reducer.fit_transform(embeddings,init=string_dict['init'])
+    pacmap_reduced_embeddings = reducer.fit_transform(embeddings,init=settings['init'])
     return pacmap_reduced_embeddings
 
 

@@ -8,7 +8,8 @@ import plotly.graph_objects as go
 
 
 
-def pacMap_dataframe(text_passages: list, multiplier: int, sources: list, pacmap_settings_int_dict: dict, pacmap_settings_float_dict: dict, pacmap_settings_bool_dict: dict, pacmap_settings_string_dict: dict) -> pd.DataFrame:
+def produce_dataframe(text_passages: list, sources: list, reducer: str, settings: dict) -> pd.DataFrame:
+    print('THIS IS THE REDUCER !!!!!!!!!!!!', reducer)
     embeddings_list = []
     all_sentences = []
     all_sources = []
@@ -22,20 +23,30 @@ def pacMap_dataframe(text_passages: list, multiplier: int, sources: list, pacmap
         all_sources.extend([source] * len(sentence))
 
     all_embeddings = np.vstack(embeddings_list)
-    pacmap_reduced_embeddings = utils.pacmap_reduce_fully_tunable(all_embeddings, pacmap_settings_int_dict, pacmap_settings_float_dict, pacmap_settings_bool_dict, pacmap_settings_string_dict)
 
-    if pacmap_settings_int_dict['n_components'] == 3:
-        df_pacmap_combined = utils.create_3d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
-    if pacmap_settings_int_dict['n_components'] == 4:   
-        df_pacmap_combined = utils.create_4d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
+
+    if reducer == 'PaCMAP':
+        reduced_embeddings = utils.pacmap_reduce_fully_tunable(all_embeddings, settings)
+    if reducer == 'UMAP':
+        reduced_embeddings = utils.umap_reduce_fully_tunable(all_embeddings, settings)
+    if reducer == 'PCA':
+        reduced_embeddings = utils.pca_reduce_fully_tunable(all_embeddings, settings)
     
-    if pacmap_settings_int_dict['n_components'] == 5:
-        df_pacmap_combined = utils.create_5d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
+    
+    if settings['n_components'] == 3:
+        df_combined = utils.create_3d_dataframe(reduced_embeddings, all_sentences, settings['multiplier'], all_sources)
+    if settings['n_components'] == 4:   
+        df_combined = utils.create_4d_dataframe(reduced_embeddings, all_sentences, settings['multiplier'], all_sources)
 
-    if pacmap_settings_int_dict['n_components'] == 6:
-        df_pacmap_combined = utils.create_6d_dataframe(pacmap_reduced_embeddings, all_sentences, multiplier, all_sources)
+    if settings['n_components'] == 5:
+        df_combined = utils.create_5d_dataframe(reduced_embeddings, all_sentences, settings['multiplier'], all_sources)
 
-    return df_pacmap_combined
+    if settings['n_components'] == 6:
+        df_combined = utils.create_6d_dataframe(reduced_embeddings, all_sentences, settings['multiplier'], all_sources)
+
+    return df_combined
+
+
 
 
 def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int, color_scale: str) -> px.scatter_3d:
