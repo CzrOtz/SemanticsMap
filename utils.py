@@ -1,4 +1,5 @@
 import re
+from turtle import st
 from cleantext import clean
 from sentence_transformers import SentenceTransformer
 from sklearn.decomposition import PCA
@@ -7,6 +8,7 @@ import umap
 import pandas as pd
 import pacmap
 import sys
+import streamlit as st
 
 def open_and_clean_text(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -46,10 +48,15 @@ def clean_text(text):
     return cleaned_text
 
 
-def embed(tokenized_sentences):
+
+@st.cache_resource
+def load_embedding_model(model_name: str):
+    return SentenceTransformer(model_name, device='cuda')
+
+def embed(tokenized_sentences, embedding_model_name):
     if len(tokenized_sentences) < 3:
         raise ValueError("At least 3 sentences are required for embedding.")
-    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cuda')
+    model = load_embedding_model(embedding_model_name)
     embeddings = model.encode(tokenized_sentences, show_progress_bar=True)
     return embeddings
 
@@ -85,6 +92,17 @@ def umap_reduce_fully_tunable(embeddings, settings):
 
 def tsne_reduce(embeddings, dimensions):
     tsne = TSNE(n_components=dimensions)
+    tsne_reduced_embeddings = tsne.fit_transform(embeddings)
+    return tsne_reduced_embeddings
+
+def tsne_reduce_fully_tunable(embeddings, settings):
+    tsne = TSNE(
+        n_components=settings['n_components'],
+        perplexity=settings['perplexity'],
+        learning_rate=settings['learning_rate'],
+        max_iter=settings['max_iter'],
+        random_state=settings['random_state']
+    )
     tsne_reduced_embeddings = tsne.fit_transform(embeddings)
     return tsne_reduced_embeddings
 

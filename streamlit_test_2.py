@@ -2,6 +2,8 @@
 import streamlit as st
 import Dynamic_comparisons_2 as dc
 
+
+
 st.set_page_config(layout="wide")
 
 st.title("Semantic Analysis Scratchpad")
@@ -16,11 +18,37 @@ with st.expander("About this tool"):
     )
 
 #SIDE BAR AREA
+models = [
+"sentence-transformers/all-MiniLM-L6-v2",
+"sentence-transformers/all-MiniLM-L12-v2",
+"sentence-transformers/paraphrase-MiniLM-L6-v2",
+"sentence-transformers/paraphrase-MiniLM-L12-v2",
+"sentence-transformers/all-mpnet-base-v2",
+"sentence-transformers/paraphrase-mpnet-base-v2",
+"sentence-transformers/all-distilroberta-v1",
+"sentence-transformers/multi-qa-mpnet-base-dot-v1",
+"sentence-transformers/multi-qa-MiniLM-L6-cos-v1",
+"sentence-transformers/multi-qa-distilbert-cos-v1",
+"sentence-transformers/paraphrase-distilroberta-base-v1",
+"sentence-transformers/paraphrase-albert-small-v2",
+"sentence-transformers/distiluse-base-multilingual-cased-v2",
+"sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+"sentence-transformers/LaBSE",
+"BAAI/bge-small-en-v1.5",
+"BAAI/bge-base-en-v1.5",
+"BAAI/bge-large-en-v1.5",
+"intfloat/e5-small-v2",
+"intfloat/e5-base-v2",
+"intfloat/e5-large-v2"
+]
 
-with st.sidebar.expander("Reduction Algorithm"):
+
+
+with st.sidebar.expander("Models and Reduction Algorithms"):
+    embedding_model = st.selectbox("Embedding Model", options=models)
     reduction_algorithm = st.selectbox(
         "Select dimensionality reduction algorithm",
-        ['PaCMAP', 'UMAP', 'PCA'],
+        ['PaCMAP', 'UMAP', 'PCA', 'tSNE'],
         index=0
     )
 
@@ -100,11 +128,31 @@ def pca_settings_func() -> dict:
             "multiplier": multiplier
         }
 
+def tsne_settings_func() -> dict:
+    with st.sidebar.expander("t-SNE Advanced Settings"):
+        # dimension_count = st.selectbox("Dimension count/n components", [3, 4, 5, 6], index=0)
+        st.write("t-SNE only supports 3 dimensions or less for visualization purposes, so the dimension count is set to 3 in this application.")
+        perplexity = st.number_input("Perplexity", value=3, min_value=1)
+        learning_rate = st.number_input("Learning Rate", value=200.0)
+        max_iter = st.number_input("Number of Iterations", value=1000)
+        random_state = st.number_input("Random State", value=42)
+        multiplier = st.number_input("Scale multiplier", min_value=1, value=1)
+
+        return {
+            "n_components": 3,
+            "perplexity": perplexity,
+            "learning_rate": learning_rate,
+            "max_iter": max_iter,
+            "random_state": random_state,
+            "multiplier": multiplier
+        }
 
 if reduction_algorithm == 'PaCMAP':
     reducer_settings = pacMap_settings_func()
 if reduction_algorithm == 'UMAP':
     reducer_settings = umap_settings_func()
+if reduction_algorithm == 'tSNE':
+    reducer_settings = tsne_settings_func()
 if reduction_algorithm == 'PCA':
     reducer_settings = pca_settings_func()
 
@@ -134,7 +182,7 @@ if reducer_settings['n_components']  == 6:
         index=0
     )
 
-    size_ref = st.sidebar.number_input("Size reference", value=20.0)
+    size_ref = st.sidebar.number_input("Size reference", value=5)
 
 
 ###### TEXT CAPTURE AREA START
@@ -182,11 +230,10 @@ st.divider()
 # text boxes end #######################
 
 def process_and_plot(reduction_algorithm):
-    if st.button("Process Texts"):
+    if st.button("Process Texts") and len(text_data) > 0:
         with st.spinner("Processing texts..."):
 
-            print("THIS IS THE REDICTION ALGORITHM PASSED TO THE FUNCTION:", reduction_algorithm)
-            data_frame = dc.produce_dataframe(text_data, labels, reduction_algorithm, reducer_settings)
+            data_frame = dc.produce_dataframe(text_data, labels, reduction_algorithm, reducer_settings, embedding_model)
 
             if reducer_settings['n_components']  == 6:
                 st.warning("scatter plot, matrix, and line plot not available for 6 dimensions")
@@ -222,7 +269,7 @@ def process_and_plot(reduction_algorithm):
                 st.plotly_chart(scatter_fig, width="stretch")
                 st.plotly_chart(matrix_fig, width="stretch")
                 st.plotly_chart(line_fig, width="stretch")
-
+        
 
 
 

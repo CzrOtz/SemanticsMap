@@ -8,8 +8,7 @@ import plotly.graph_objects as go
 
 
 
-def produce_dataframe(text_passages: list, sources: list, reducer: str, settings: dict) -> pd.DataFrame:
-    print('THIS IS THE REDUCER !!!!!!!!!!!!', reducer)
+def produce_dataframe(text_passages: list, sources: list, reducer: str, settings: dict, embedding_model_name: str) -> pd.DataFrame:
     embeddings_list = []
     all_sentences = []
     all_sources = []
@@ -17,7 +16,7 @@ def produce_dataframe(text_passages: list, sources: list, reducer: str, settings
     for i, source in zip(text_passages, sources):
         text = utils.clean_text(i)
         sentence = nltk.sent_tokenize(text)
-        embeddings = utils.embed(sentence)
+        embeddings = utils.embed(sentence, embedding_model_name)
         embeddings_list.append(embeddings)
         all_sentences.extend(sentence)
         all_sources.extend([source] * len(sentence))
@@ -31,6 +30,8 @@ def produce_dataframe(text_passages: list, sources: list, reducer: str, settings
         reduced_embeddings = utils.umap_reduce_fully_tunable(all_embeddings, settings)
     if reducer == 'PCA':
         reduced_embeddings = utils.pca_reduce_fully_tunable(all_embeddings, settings)
+    if reducer == 'tSNE':
+        reduced_embeddings = utils.tsne_reduce_fully_tunable(all_embeddings, settings)
     
     
     if settings['n_components'] == 3:
