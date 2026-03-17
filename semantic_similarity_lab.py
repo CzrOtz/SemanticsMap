@@ -1,8 +1,11 @@
-# python -m streamlit run streamlit_test_2.py
+# python -m streamlit run semantic_similarity_lab.py
+from multiprocessing import reduction
+
 import streamlit as st
 import Dynamic_comparisons_2 as dc
 
-
+#add this timorrow
+#sklearn.metrics.pairwise.cosine_similarity — takes two arrays of embeddings and returns a similarity matrix
 
 st.set_page_config(layout="wide")
 
@@ -12,9 +15,16 @@ st.title("Semantic Similarity Lab")
 with st.expander("About this tool"):
     st.write(
         """This tool allows you to visualize the semantic similarity of texts using various embedding models and dimensionality reduction algorithms. 
-        You can input multiple texts, select an embedding model, and choose a dimensionality reduction technique to see how the texts relate to each other in a reduced-dimensional space. You are able to visualize up to 6 dimensions. 
+        You can input multiple texts, select an embedding model, and choose a dimensionality reduction technique to see how the texts relate to each other in a reduced-dimensional space."""
+    )
+
+    st.write("""You are able to visualize up to 6 dimensions. 
         Please note, visualization options will vary based on the number of dimensions you choose. For 3 dimensions, scatter, line, and matrix plots are available. For 4 dimensions, scatter and matrix plots are available. For 5 dimensions, 
         only scatter plot is available. For 6 dimensions, only cone plot is available. t-SNE is limited to 3 dimensions for visualization purposes using the barnes-hut method, so if you select t-SNE, the dimension count will be set to 3 and the other dimension options will be hidden."""
+    )
+
+    st.write(
+        """ more text later"""
     )
 
 #SIDE BAR AREA
@@ -271,85 +281,89 @@ st.divider()
 
 
 
-def process_and_plot(reduction_algorithm):
-    if st.button("Process Texts") and len(text_data) > 0:
-        with st.spinner("Processing texts..."):
 
-            data_frame = dc.produce_dataframe(text_data, labels, reduction_algorithm, reducer_settings, embedding_model)
 
+def GeneratePlots(data_frame):
+    if reducer_settings['n_components']  == 6:
+                
+        cone_plot = dc.cone_plot(data_frame, color_scale, size_mode, size_ref, reducer_settings['n_components'], reduction_algorithm, embedding_model)
+        st.plotly_chart(cone_plot, width="stretch")
+        st.warning("scatter plot, matrix, and line plot not available for 6 dimensions")
             
-            metrics = dc.metrics(data_frame)
+    if reducer_settings['n_components'] == 5:
 
-            with st.expander("Metrics"):
-                st.write("**Description:**")
-                st.write(metrics['description'])
-                st.write("**Missing Values:**")
-                st.write(metrics['missing_values'])
-                st.write("**Unique Sources:**")
-                st.write(metrics['unique_sources'])
-                st.write("**Unique Sentences:**")
-                st.write(metrics['unique_sentences'])
-                st.write("**Sentence Counts per Source:**")
-                st.write(metrics['sentence_counts_per_source'])
-                st.write("**Centroid per Source:**")
-                st.write(metrics['centroid_per_source'])
-                st.write("**Standard Deviation per Source:**")
-                st.write(metrics['std_per_source'])
-                st.write("**Total Sentences:**")
-                st.write(metrics['total_sentences'])
-                st.write("**Source List:**")
-                st.write(metrics['source_list'])
+
+        scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
+
+        st.plotly_chart(scatter_fig, width="stretch")
+
+        st.warning("line plot and matrix not available for 5 dimensions")
+        st.warning("cone plot not available for dimensions 5 through 3")
+        st.warning("matrix plot not available for 5 dimensions and lower")
+
+    if reducer_settings['n_components'] == 4:
+
+        scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
+        matrix_fig = dc.scatter_matrix(data_frame, reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
+
+        st.plotly_chart(scatter_fig, width="stretch")
+        st.plotly_chart(matrix_fig, width="stretch")
+
+        st.warning("cone plot not available for dimensions 5 through 3")
+        st.warning("line plot not available for 4 dimensions")
+
+    if reducer_settings['n_components'] == 3:
                 
 
-            if reducer_settings['n_components']  == 6:
-                
-                cone_plot = dc.cone_plot(data_frame, color_scale, size_mode, size_ref, reducer_settings['n_components'], reduction_algorithm, embedding_model)
-                st.plotly_chart(cone_plot, width="stretch")
-                st.warning("scatter plot, matrix, and line plot not available for 6 dimensions")
-            
-            if reducer_settings['n_components'] == 5:
+        scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
+        matrix_fig = dc.scatter_matrix(data_frame, reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
+        line_fig = dc.line_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], reduction_algorithm, embedding_model)
 
-
-                scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
-
-                st.plotly_chart(scatter_fig, width="stretch")
-
-                st.warning("line plot and matrix not available for 5 dimensions")
-                st.warning("cone plot not available for dimensions 5 through 3")
-                st.warning("matrix plot not available for 5 dimensions and lower")
-
-            if reducer_settings['n_components'] == 4:
-
-                scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
-                matrix_fig = dc.scatter_matrix(data_frame, reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
-
-                st.plotly_chart(scatter_fig, width="stretch")
-                st.plotly_chart(matrix_fig, width="stretch")
-
-                st.warning("cone plot not available for dimensions 5 through 3")
-                st.warning("line plot not available for 4 dimensions")
-
-            if reducer_settings['n_components'] == 3:
-                
-
-                scatter_fig = dc.scatter_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
-                matrix_fig = dc.scatter_matrix(data_frame, reducer_settings['n_components'], color_scale, reduction_algorithm, embedding_model)
-                line_fig = dc.line_plot(data_frame, 'dim1', 'dim2', 'dim3', reducer_settings['n_components'], reduction_algorithm, embedding_model)
-
-                st.plotly_chart(scatter_fig, width="stretch")
-                st.plotly_chart(matrix_fig, width="stretch")
-                st.plotly_chart(line_fig, width="stretch")
-
-                st.warning("cone plot not available for dimensions 5 through 3")
+        st.plotly_chart(scatter_fig, width="stretch")
+        st.plotly_chart(matrix_fig, width="stretch")
+        st.plotly_chart(line_fig, width="stretch")
+        st.warning("cone plot not available for dimensions 5 through 3")
         
 
+def cosine_similarity_functions():
+        show_cosine_similarity = dc.run_cosine_similarity(text_data, labels, embedding_model)
+        st.write("Cosine Similarity Matrix between the two sets of embeddings:")
+        st.write(show_cosine_similarity)
 
+def metrics(data_frame):
+    metrics = dc.metrics(data_frame)
+    st.write("**Description:**")
+    st.write(metrics['description'])
+    st.write("**Missing Values:**")
+    st.write(metrics['missing_values'])
+    st.write("**Unique Sources:**")
+    st.write(metrics['unique_sources'])
+    st.write("**Unique Sentences:**")
+    st.write(metrics['unique_sentences'])
+    st.write("**Sentence Counts per Source:**")
+    st.write(metrics['sentence_counts_per_source'])
+    st.write("**Centroid per Source:**")
+    st.write(metrics['centroid_per_source'])
+    st.write("**Standard Deviation per Source:**")
+    st.write(metrics['std_per_source'])
+    st.write("**Total Sentences:**")
+    st.write(metrics['total_sentences'])
+    st.write("**Source List:**")
+    st.write(metrics['source_list'])
+    
 
 
     
-
-process_and_plot(reduction_algorithm)
-  
+if st.button("Process Texts") and len(text_data) > 0:
+    with st.spinner(f"Processing cosine similarity with {embedding_model}..."):
+        cosine_similarity_functions()
+    with st.spinner(f"reducing dimensions using {reduction_algorithm} and generating plots..."):
+        data_frame_reduced_dimmension = dc.produce_dataframe(text_data, labels, reduction_algorithm, reducer_settings, embedding_model)
+    with st.spinner(f"Generating plots..."):
+        GeneratePlots(data_frame_reduced_dimmension)
+    with st.spinner(f"Calculating metrics..."):
+        metrics(data_frame_reduced_dimmension)
+    
 
 
 

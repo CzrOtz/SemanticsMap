@@ -4,7 +4,8 @@ import utils
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-
+from sklearn.metrics.pairwise import cosine_similarity
+from itertools import combinations
 
 
 
@@ -46,6 +47,44 @@ def produce_dataframe(text_passages: list, sources: list, reducer: str, settings
         df_combined = utils.create_6d_dataframe(reduced_embeddings, all_sentences, settings['multiplier'], all_sources)
 
     return df_combined
+
+def run_cosine_similarity(text_passages: list, sources: list, embedding_model_name: str):
+    embeddings_list = []
+    sentences_list = []
+
+    for i, source in zip(text_passages, sources):
+        text = utils.clean_text(i)
+        sentences = nltk.sent_tokenize(text)
+        embeddings = utils.embed(sentences, embedding_model_name)
+        embeddings_list.append(embeddings)
+        sentences_list.append(sentences)
+
+    results = []
+
+    for (idx_a, idx_b) in combinations(range(len(embeddings_list)), 2):
+        matrix = cosine_similarity(embeddings_list[idx_a], embeddings_list[idx_b])
+
+        for i, row in enumerate(matrix):
+            j = np.argmax(row)
+            score = row[j]
+            results.append({
+                "source_a": sources[idx_a],
+                "sentence_a": sentences_list[idx_a][i],
+                "source_b": sources[idx_b],
+                "nearest_sentence_b": sentences_list[idx_b][j],
+                "similarity": round(float(score), 4)
+            })
+
+    return pd.DataFrame(results)
+    
+    #embeddings_list[i]
+    # corresponds to the source
+    #embedings_list[i][j]
+    #corresponds to the sentence
+
+    
+
+
 
 def metrics(data_frame: pd.DataFrame) -> pd.DataFrame:
     
