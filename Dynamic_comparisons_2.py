@@ -92,7 +92,6 @@ def metrics(data_frame: pd.DataFrame) -> pd.DataFrame:
 
     metrics = {
         "description": copy_df.describe(),
-        "missing_values": copy_df.isnull().sum(),
         "unique_sources": copy_df['source'].nunique(),
         "unique_sentences": copy_df['sentences'].nunique(),
         "sentence_counts_per_source": copy_df.groupby('source')['sentences'].count(),

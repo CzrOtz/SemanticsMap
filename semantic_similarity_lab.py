@@ -1,5 +1,6 @@
 # python -m streamlit run semantic_similarity_lab.py
 from multiprocessing import reduction
+import plotly.express as px
 
 import streamlit as st
 import Dynamic_comparisons_2 as dc
@@ -329,13 +330,21 @@ def cosine_similarity_functions():
         show_cosine_similarity = dc.run_cosine_similarity(text_data, labels, embedding_model)
         st.write("Cosine Similarity Matrix between the two sets of embeddings:")
         st.write(show_cosine_similarity)
+        fig = px.bar(
+            show_cosine_similarity, 
+            x=show_cosine_similarity.index, 
+            y="similarity", 
+            title=f"Raw Similarity Scores using {embedding_model}",
+            hover_data=["sentence_a", "source_a", "nearest_sentence_b", "source_b"],
+            )
+        
+        st.plotly_chart(fig)
+        
 
 def metrics(data_frame):
     metrics = dc.metrics(data_frame)
     st.write("**Description:**")
     st.write(metrics['description'])
-    st.write("**Missing Values:**")
-    st.write(metrics['missing_values'])
     st.write("**Unique Sources:**")
     st.write(metrics['unique_sources'])
     st.write("**Unique Sentences:**")
@@ -358,6 +367,7 @@ if st.button("Process Texts") and len(text_data) > 0:
     with st.spinner(f"Processing cosine similarity with {embedding_model}..."):
         with st.expander("Cosine Similarity Matrix"):
             cosine_similarity_functions()
+
     with st.spinner(f"reducing dimensions using {reduction_algorithm} and generating plots..."):
         data_frame_reduced_dimmension = dc.produce_dataframe(text_data, labels, reduction_algorithm, reducer_settings, embedding_model)
     with st.spinner(f"Generating plots..."):
