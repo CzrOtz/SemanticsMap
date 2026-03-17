@@ -356,12 +356,13 @@ def metrics(data_frame):
     
 if st.button("Process Texts") and len(text_data) > 0:
     with st.spinner(f"Processing cosine similarity with {embedding_model}..."):
-        cosine_similarity_functions()
+        with st.expander("Cosine Similarity Matrix"):
+            cosine_similarity_functions()
     with st.spinner(f"reducing dimensions using {reduction_algorithm} and generating plots..."):
         data_frame_reduced_dimmension = dc.produce_dataframe(text_data, labels, reduction_algorithm, reducer_settings, embedding_model)
     with st.spinner(f"Generating plots..."):
         GeneratePlots(data_frame_reduced_dimmension)
-    with st.spinner(f"Calculating metrics..."):
+    with st.spinner(f"Calculating metrics..."):      
         metrics(data_frame_reduced_dimmension)
     
 
