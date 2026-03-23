@@ -1,2 +1,8 @@
-*.txt
-*.csv
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local environments
+venv/
+.env
