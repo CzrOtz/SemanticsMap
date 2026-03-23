@@ -1,0 +1,11 @@
+streamlit
+sentence-transformers
+cleantext
+nltk
+scikit-learn
+umap-learn
+pacmap
+plotly
+pandas
+numpy
+scipy

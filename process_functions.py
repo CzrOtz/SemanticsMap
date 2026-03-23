@@ -6,7 +6,6 @@ import numpy as np
 import plotly.graph_objects as go
 from sklearn.metrics.pairwise import cosine_similarity
 from itertools import combinations
-import streamlit as st
 
 nltk.download('punkt')
 nltk.download('punkt_tab')

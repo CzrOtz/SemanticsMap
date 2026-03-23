@@ -1,16 +1,15 @@
 # python -m streamlit run semantic_similarity_lab.py
-from multiprocessing import reduction
 import plotly.express as px
 import numpy as np
 import utils as ut
 import streamlit as st
-import GraphIt.process_functions as dc
+import process_functions as dc
 
 import pandas as pd
 
 st.set_page_config(layout="wide")
 
-st.title("GraphIt: A Semantic Similarity Lab")
+st.title("GraphIt: High-Dimensional Semantic Similarity Laboratory")
 
 with st.expander("📖 About GraphIt: Semantic Similarity Lab", expanded=True):
     st.markdown("""
