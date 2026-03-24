@@ -14,6 +14,16 @@ The result: a spatial, mathematical audit of how documents relate to one another
 
 ## Core Capabilities
 
+
+## Examples
+
+### Semantic Trajectory (Line Plot)
+<img src="assets/3D_screenshot_GraphIt.png" width="800"/>
+
+### Vector Field (Local Semantic Transitions)
+<img src="assets/6D_screenshot_GraphIt" width="800"/>
+
+
 ### 🔵 Manifold Dimensionality Reduction
 
 Four fully tunable reduction algorithms, each with its own hyperparameter panel in the sidebar:
