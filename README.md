@@ -185,16 +185,6 @@ GraphIt/
 
 ---
 
-## Quick Start
-
-```bash
-pip install -r requirements.txt
-streamlit run semantic_similarity_lab.py
-```
-
-> For exact reproducibility, use `requirements-lock.txt` instead.
-
----
 
 ## Installation
 
@@ -211,6 +201,8 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 
 # 3. Install dependencies
 pip install -r requirements.txt
+
+> For exact reproducibility, use `requirements-lock.txt` instead.
 
 # 4. Launch
 python -m streamlit run semantic_similarity_lab.py
