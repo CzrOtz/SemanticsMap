@@ -139,7 +139,7 @@ def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z
 
     if dimensions == 3: color_cordinate = "source"
 
-    fig_pacmap = px.scatter_3d(
+    fig = px.scatter_3d(
         data_frame,
         x=x_cordinate,
         y=y_cordinate,
@@ -156,12 +156,12 @@ def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z
 
 
     if dimensions >= 4:
-        fig_pacmap.update_layout(
+        fig.update_layout(
             legend=dict(x=0.01, y=0.99, xanchor="left", yanchor="top"),
             coloraxis_colorbar=dict(x=1.08, y=0.5, len=0.8),
             margin=dict(r=80)
         )
-        fig_pacmap.update_traces(
+        fig.update_traces(
             marker=dict(
                 colorbar=dict(
                     x=1.15,
@@ -172,7 +172,7 @@ def scatter_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z
             )
         )   
 
-    return fig_pacmap
+    return fig  
 
 def scatter_plot_v2(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int, color_scale: str, reducer: str, embedding_model_name: str, show_origin: bool) -> px.scatter_3d:
 
@@ -183,7 +183,7 @@ def scatter_plot_v2(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str
 
     if dimensions == 3: color_cordinate = "source"
 
-    fig_pacmap = px.scatter_3d(
+    fig = px.scatter_3d(
         data_frame,
         x=x_cordinate,
         y=y_cordinate,
@@ -199,12 +199,12 @@ def scatter_plot_v2(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str
 
 
     if dimensions >= 4:
-        fig_pacmap.update_layout(
+        fig.update_layout(
             legend=dict(x=0.01, y=0.99, xanchor="left", yanchor="top"),
             coloraxis_colorbar=dict(x=1.08, y=0.5, len=0.8),
             margin=dict(r=80)
         )
-        fig_pacmap.update_traces(
+        fig.update_traces(
             marker=dict(
                 colorbar=dict(
                     x=1.15,
@@ -215,7 +215,7 @@ def scatter_plot_v2(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str
             )
         )
     if show_origin:
-        fig_pacmap.add_trace(go.Scatter3d(
+        fig.add_trace(go.Scatter3d(
             x=[0],
             y=[0],
             z=[0],
@@ -231,13 +231,13 @@ def scatter_plot_v2(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str
             hovertemplate="Origin (Zero Variance)<extra></extra>"
         ))       
 
-    return fig_pacmap
+    return fig
 
 def line_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_cordinate: str, dimensions: int, reducer: str, embedding_model_name: str) -> px.scatter_3d:
     if dimensions == 4: color_cordinate = "dim4"
     if dimensions == 3: color_cordinate = "source"
 
-    fig_pacmap = px.line_3d(
+    fig = px.line_3d(
         data_frame,
         x=x_cordinate,
         y=y_cordinate,
@@ -250,18 +250,15 @@ def line_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_co
         width=1200
     )
 
-    # fig_pacmap.update_layout(
-    #     paper_bgcolor="#161b22",
-    #     plot_bgcolor="#161b22"
-    #     )
+
 
     if dimensions == 4:
-        fig_pacmap.update_layout(
+        fig.update_layout(
             legend=dict(x=0.01, y=0.99, xanchor="left", yanchor="top"),
             coloraxis_colorbar=dict(x=1.08, y=0.5, len=0.8),
             margin=dict(r=80)
         )
-        fig_pacmap.update_traces(
+        fig.update_traces(
             marker=dict(
                 colorbar=dict(
                     x=1.15,
@@ -272,7 +269,7 @@ def line_plot(data_frame: pd.DataFrame, x_cordinate: str, y_cordinate: str, z_co
             )
         )   
 
-    return fig_pacmap
+    return fig
 
 def scatter_matrix(data_frame: pd.DataFrame, dimensions: int, color_scale: str, reducer: str, embedding_model_name: str) -> px.scatter_matrix:
     if dimensions == 4: color_cordinate = "dim4"

@@ -106,7 +106,7 @@ def umap_reduce_fully_tunable(embeddings, settings):
 
 
 def tsne_reduce_fully_tunable(embeddings, settings):
-    if len(embeddings) >= settings['perplexity']:
+    if settings['perplexity'] >= len(embeddings):
         st.error(f"The number of total sences is {len(embeddings)}. Current perplexity is {settings['perplexity']}. Perplexity must be less than the total samples/sences. Please adjust the perplexity, or add more sentences to the text fields.")
         st.stop()
 
