@@ -15,8 +15,6 @@ The result: a spatial, mathematical audit of how documents relate to one another
 
 Try it out here: https://graphit3d.streamlit.app/
 
-## Core Capabilities
-
 
 ## Examples
 
@@ -26,6 +24,7 @@ Try it out here: https://graphit3d.streamlit.app/
 ### Vector Field (Local Semantic Transitions)
 <img src="assets/6D_screenshot.png" width="800"/>
 
+## Core Capabilities
 
 ### 🔵 Manifold Dimensionality Reduction
 
