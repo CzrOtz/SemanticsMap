@@ -98,8 +98,8 @@ with st.expander("📖 About GraphIt: Semantic Similarity Lab", expanded=True):
  
         **4 · Execution & Analytics**  
         Select a processing scope and click **Process Text**:  
-        — **Pre-reduction** → cosine similarity matrix + Grand Tour animation  
-        — **Post-reduction** → manifold projection + spatial plots + centroid metrics + magnitude extremes  
+        — **Pre-reduction** → cosine similarity matrix and Grand Tour animation  
+        — **Post-reduction** → manifold projection, spatial plots, centroid metrics (graph included), standard deviation (graph included), magnitude and other metrics
         — **Both** → full pipeline  
         
         > ⚠️ **t-SNE:** Perplexity must be less than your total sentence count across all sources. 
@@ -518,7 +518,7 @@ def metrics(data_frame):
 
     st.write("**Metrics and Analysis:**")
 
-    with st.expander("Rediced Dimension DataFrame"):
+    with st.expander("Dimensionally Reduced DataFrame"):
         st.write("This is the DataFrame containing the reduced-dimensionality embeddings for each sentence, along with their corresponding sources and original sentences. You can use this DataFrame to explore the relationships between the sentences in the reduced-dimensional space and to calculate various metrics based on their positions in this space.")
         st.write(data_frame)
 
