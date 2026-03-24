@@ -1,0 +1,17 @@
+[theme]
+font = "Plus Jakarta Sans"
+headingFont = "Fraunces"
+
+[theme.dark]
+primaryColor = "#E2E8F0"            
+backgroundColor = "#111111"         
+secondaryBackgroundColor = "#1C1C1C" 
+textColor = "#FFFFFF"               
+borderColor = "#333333"             
+
+[theme.light]
+primaryColor = "#1E293B"            
+backgroundColor = "#FFFFFF"         
+secondaryBackgroundColor = "#F3F4F6" 
+textColor = "#111827"               
+borderColor = "#D1D5DB"            

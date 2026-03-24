@@ -4,28 +4,14 @@ import numpy as np
 import utils as ut
 import streamlit as st
 import process_functions as dc
-
 import pandas as pd
+
 
 st.set_page_config(layout="wide", page_title="GraphIt", page_icon="🧪")
 
 st.title("GraphIt: High-Dimensional Semantic Similarity Laboratory")
 
-# st.markdown("""
-#     <style>
-#     /* Tighten the header */
-#     .block-container { padding-top: 2rem; }
-    
-#     /* Give tables some breathing room */
-#     table { width: 100%; }
-    
-#     /* Subtle metric card feel */
-#     [data-testid="stExpander"] {
-#         border: 1px solid rgba(255,255,255,0.1);
-#         border-radius: 8px;
-#     }
-#     </style>
-# """, unsafe_allow_html=True)
+
 
 with st.expander("📖 About GraphIt: Semantic Similarity Lab", expanded=True):
  
