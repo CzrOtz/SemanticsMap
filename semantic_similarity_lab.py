@@ -7,68 +7,138 @@ import process_functions as dc
 
 import pandas as pd
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title="GraphIt", page_icon="🧪")
 
 st.title("GraphIt: High-Dimensional Semantic Similarity Laboratory")
 
-with st.expander("📖 About GraphIt: Semantic Similarity Lab", expanded=True):
-    st.markdown("""
-    This laboratory enables the multi-dimensional visualization of text embeddings using state-of-the-art manifold learning and dimensionality reduction. 
-    By projecting high-dimensional vectors into a visible coordinate system, you can analyze semantic clusters, document overlap, and latent thematic structures.
-    """)
-
-    st.divider()
-
-    ### Visual Logic Mapping
-    st.markdown("#### 📐 Visualization Capabilities")
+# st.markdown("""
+#     <style>
+#     /* Tighten the header */
+#     .block-container { padding-top: 2rem; }
     
-    # Table for quick dimension reference
+#     /* Give tables some breathing room */
+#     table { width: 100%; }
+    
+#     /* Subtle metric card feel */
+#     [data-testid="stExpander"] {
+#         border: 1px solid rgba(255,255,255,0.1);
+#         border-radius: 8px;
+#     }
+#     </style>
+# """, unsafe_allow_html=True)
+
+with st.expander("📖 About GraphIt: Semantic Similarity Lab", expanded=True):
+ 
     st.markdown("""
+    **GraphIt** is a multi-dimensional semantic laboratory for researchers and data scientists who need to *see* how language models organize meaning.
+    
+    Paste raw text from up to **10 sources**. GraphIt tokenizes each source into sentences, vectorizes them using your chosen Hugging Face sentence transformer, 
+    and projects the resulting high-dimensional embeddings into an interactive 3D–6D coordinate space — exposing semantic clusters, 
+    cross-document overlap, centroid drift, and latent thematic geometry that standard similarity scores cannot surface.
+    """)
+ 
+    st.divider()
+ 
+    # ── Visualization Capabilities ──────────────────────────────────────────
+    st.markdown("#### 📐 Visualization Capabilities")
+    st.markdown("""
+    GraphIt maps reduction dimensions to visual channels, encoding up to **6 semantic axes simultaneously**:
+ 
     | Dimensions | Available Plot Types | Encoding Logic |
     | :--- | :--- | :--- |
-    | **3D** | Scatter, Line, Matrix | X, Y, Z Coordinates |
-    | **4D** | Scatter, Matrix | X, Y, Z + Color (`dim4`) |i 
-    | **5D** | Scatter | X, Y, Z + Color (`dim4`) + Size (`dim5`).abs() |
-    | **6D** | Cone Plot | X, Y, Z (Pos) + U, V, W (Vectors) |
-    
-    *Note: **t-SNE** is restricted to 3D via the Barnes-Hut method for optimized performance.*
+    | **3D** | Scatter · Line · Scatter Matrix | X, Y, Z spatial coordinates |
+    | **4D** | Scatter · Scatter Matrix | X, Y, Z + continuous color scale (`dim4`) |
+    | **5D** | Scatter | X, Y, Z + color (`dim4`) + marker size (`dim5`, forced absolute) |
+    | **6D** | Cone Plot | X, Y, Z position + U, V, W trajectory vectors |
+ 
+    > **t-SNE** is restricted to **3D** via the Barnes-Hut approximation for tractable performance.  
+    > **5D** marker size uses `dim5.abs()` — all size values are forced non-negative before rendering.  
+    > **6D** cone `sizemode` and `sizeref` are configurable in the sidebar.
     """)
-
+ 
     st.divider()
-
-    ### Workflow Instructions
+ 
+    # ── Pre-Reduction Analytics ──────────────────────────────────────────────
+    st.markdown("#### 🔬 Pre-Reduction Analytics")
+ 
+    col_pre1, col_pre2 = st.columns(2)
+ 
+    with col_pre1:
+        st.markdown("""
+        **Cosine Similarity Matrix**  
+        For every pair of sources, each sentence in Source A is matched against every sentence in Source B. 
+        The nearest-neighbor sentence from Source B is returned alongside its similarity score, source label, and full sentence text. 
+        All pairwise source combinations are computed automatically. Requires **at least 2 sources.**
+        """)
+ 
+    with col_pre2:
+        st.markdown("""
+        **Grand Tour Projection**  
+        A 2D animated scatter that cycles through adjacent dimension pairs of the *raw* embedding space — before any reduction distorts global relationships. 
+        Reveals structural geometry in the original high-dimensional space. 
+        Fully configurable: point size, frame duration, transition duration, and easing function.
+        """)
+ 
+    st.divider()
+ 
+    # ── Operational Workflow ─────────────────────────────────────────────────
     st.markdown("#### 🛠️ Operational Workflow")
-    
+ 
     col1, col2 = st.columns(2)
-    
+ 
     with col1:
         st.markdown("""
-        **1. Engine Configuration**
-        Select an **Embedding Model** and **Reduction Algorithm** in the sidebar. Adjust hyperparameters like *Perplexity* (t-SNE) or *Learning Rate* (PaCMAP) to resolve local vs. global data structures.
-
-        **2. Data Ingestion**
-        Input your text documents (Max: 10). At least two sources are required for **Cosine Similarity** analysis, though single-document semantic drift can be analyzed individually.
+        **1 · Engine Configuration**  
+        Select an **Embedding Model** and **Reduction Algorithm** in the sidebar. 
+        Each algorithm exposes its full hyperparameter surface — tune *Perplexity* (t-SNE), 
+        *MN Ratio / FP Ratio* (PaCMAP), *Min Dist* (UMAP), or *SVD Solver* (PCA) 
+        to control local vs. global structure preservation.  
+        The active model's Hugging Face Model Card is linked directly in the sidebar.
+        Multilingual support is **automatically detected** and labeled for the selected model.
+ 
+        **2 · Data Ingestion**  
+        Paste text into the document containers **(1–10 sources)**. Label each source. 
+        A minimum of **3 sentences per source** is required for all operations. 
+        A minimum of **2 sources** is required for cosine similarity analysis.
         """)
-
+ 
     with col2:
         st.markdown("""
-        **3. Pre-processing & Sanitization**
-        Configure **Clean Text Settings** to remove noise (URLs, metadata, special characters). High-quality vectorization depends on clean input; complex formatting should be handled in an external editor prior to pasting.
-
-        **4. Execution & Analytics**
-        Click **Process Text**. Select **Pre-reduction** for raw similarity scores or **Post-reduction** for spatial visualizations and centroid metrics.
+        **3 · Sanitization**  
+        Expand **Clean Text Settings** to configure 12 preprocessing options — 
+        Unicode normalization, URL/email removal, bracket stripping, whitespace collapsing, and more. 
+        A post-cleaning preview renders before embedding begins so you can verify output before committing.
+        Complex formatting should be resolved in an external editor prior to pasting.
+ 
+        **4 · Execution & Analytics**  
+        Select a processing scope and click **Process Text**:  
+        — **Pre-reduction** → cosine similarity matrix + Grand Tour animation  
+        — **Post-reduction** → manifold projection + spatial plots + centroid metrics + magnitude extremes  
+        — **Both** → full pipeline  
+        
+        > ⚠️ **t-SNE:** Perplexity must be less than your total sentence count across all sources. 
+        The application validates this at runtime and will halt with a descriptive error if violated.
         """)
-
+ 
     st.divider()
-
-    ### Contribution CTA
-    st.markdown("""
-    **🚀 Open Source & Collaboration**
-    Think there is a feature missing, or want to make a custom modification for your use case? This tool is built for the community.
-    * [**Fork the Repository**](https://github.com/CzrOtz/SemanticsMap)
-    * [**Submit a Pull Request**](https://github.com/CzrOtz/SemanticsMap/pulls)
-    * [**Report an Issue**](https://github.com/CzrOtz/SemanticsMap/issues)
-    """)
+ 
+    # ── Open Source CTA ──────────────────────────────────────────────────────
+    st.markdown("#### 🚀 Open Source & Collaboration")
+    st.write("If you find an issue, or want a custom feature, please contribute or feel free to fork the repository to tailor it to your needs! GraphIt is open source on GitHub:")
+    
+    col_cta1, col_cta2, col_cta3 = st.columns(3)
+ 
+    with col_cta1:
+        st.markdown("🍴 [**Fork the Repository**](https://github.com/CzrOtz/GraphIt)  \nCustomize it for your use case.")
+ 
+    with col_cta2:
+        st.markdown("🔧 [**Submit a Pull Request**](https://github.com/CzrOtz/GraphIt/pulls)  \nContribute a feature or fix.")
+ 
+    with col_cta3:
+        st.markdown("🐛 [**Report an Issue**](https://github.com/CzrOtz/GraphIt/issues)  \nFound a bug? Let us know.")
+    
+    st.divider()
+    st.markdown("Built by **Cesar A. Ortiz Machin** · [GitHub](https://github.com/CzrOtz)")
 
 #SIDE BAR AREA
 models = [
