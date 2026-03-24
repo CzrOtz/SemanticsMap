@@ -162,15 +162,27 @@ A **post-cleaning preview** is rendered before processing so you can verify sani
 
 ## Repository Structure
 
-```
+```text
 GraphIt/
 ├── .gitignore                   # Version control exclusion rules
 ├── README.md                    # This document
-├── requirements.txt             # Pinned dependency manifest
+├── requirements-lock.txt        # Exact frozen environment versions
+├── requirements.txt             # Minimal dependency manifest
 ├── semantic_similarity_lab.py   # Streamlit UI, sidebar controls, session state, layout
 ├── process_functions.py         # Embedding pipeline, reduction dispatch, all plot generators, metrics
 └── utils.py                     # Text cleaning, model loading, reduction math, dataframe constructors
 ```
+
+---
+
+## Quick Start
+
+```bash
+pip install -r requirements.txt
+streamlit run semantic_similarity_lab.py
+```
+
+> For exact reproducibility, use `requirements-lock.txt` instead.
 
 ---
 

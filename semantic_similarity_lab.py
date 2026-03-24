@@ -124,7 +124,7 @@ with st.expander("📖 About GraphIt: Semantic Similarity Lab", expanded=True):
         st.markdown("🐛 [**Report an Issue**](https://github.com/CzrOtz/GraphIt/issues)  \nFound a bug? Let us know.")
     
     st.divider()
-    st.markdown("Built by **Cesar A. Ortiz Machin** · [GitHub](https://github.com/CzrOtz)")
+    st.markdown("Built by **Cesar Ortiz** · [GitHub](https://github.com/CzrOtz)")
 
 #SIDE BAR AREA
 models = [
