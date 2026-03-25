@@ -13,7 +13,10 @@ The result: a spatial, mathematical audit of how documents relate to one another
 ### Live Demo
 Try it out here: https://graphit3d.streamlit.app/
 
----
+**Note:** The live demo runs on Streamlit Community Cloud and is intentionally limited by shared CPU and memory resources, so text processing and embedding generation will be slower than a local run. In this repository, embedding models are currently loaded on CPU in `utils.py`
+
+For full performance, clone the repository and run GraphIt locally. Users with compatible hardware can modify the model-loading code to use CUDA on their own machine. Streamlit’s default file upload limit is 200 MB per file; if needed, this can be increased by adding server.maxUploadSize to .streamlit/config.toml.
+
 ## Examples
 
 ### Semantic Trajectory (Line Plot)
